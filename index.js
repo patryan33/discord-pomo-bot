@@ -2,6 +2,7 @@
   A ping pong bot, whenever you send "ping", it replies "pong".
 */
 
+require('dotenv').config();
 // Import the discord.js module
 const Discord = require('discord.js');
 
@@ -22,8 +23,10 @@ function endTimer(message) {
 }
 
 function getTimeLeft(timeout) {
-    if (timeout === null) return -1;
-    return Math.ceil((((timeout._idleTimeout - (Date.now() - timeout.start))/ 1000)) / 60);
+    if (timeout === null) return [-1, 0];
+    let seconds = Math.ceil((((timeout._idleTimeout - (Date.now() - timeout.start))/ 1000))) % 60;
+    let minutes = Math.floor((((timeout._idleTimeout - (Date.now() - timeout.start))/ 1000)) / 60);
+    return [minutes, seconds];
 }
 
 client.on('ready', () => {
@@ -91,25 +94,22 @@ client.on('message', message => {
     // ask for time remaining on current timer. Returns time in minutes.
     if (message.content === '$time') {
         time = getTimeLeft(timer);
-        if (time === -1) {
+        if (time[0] === -1) {
             message.channel.send("No active timer");
         } else { // composing message
-            var minute; // Whether to say minute or minutes
+            var minutes = time[0];
+            var seconds = time[1];
+            var numberMinute; // Whether to say minute or minutes
             var breakMsg; // whether to say break or study session
-            if (time === 1) {
-                minute = " minute"
-            } else {
-                minute = " minutes"
-            }
             if (breakTime) {
                 breakMsg = " left in break."
             } else {
                 breakMsg = " left in study session."
             }
-            message.channel.send(time + minute + breakMsg);
+            message.channel.send(minutes +  ":" + seconds + breakMsg);
         }
     }
 });
 
 // Log our bot in
-client.login(token);
+client.login(process.env.BOT_TOKEN);
