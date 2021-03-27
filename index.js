@@ -63,6 +63,9 @@ client.on('message', message => {
             }
         }
     }
+    if (message.content.startsWith('$help')) {
+      message.channel.send("$pomo #, $break #, $time, $stop");
+    }
     // when user wants to start their break
     if (message.content.startsWith('$break')) {
         if (timer !== null) {
