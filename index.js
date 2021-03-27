@@ -1,7 +1,7 @@
 /*
-  A ping pong bot, whenever you send "ping", it replies "pong".
+  https://www.freecodecamp.org/news/create-a-discord-bot-with-javascript-nodejs/
 */
-
+const keepAlive = require("./server")
 require('dotenv').config();
 // Import the discord.js module
 const Discord = require('discord.js');
@@ -87,9 +87,14 @@ client.on('message', message => {
     }
     // stop timer
     if (message.content === '$stop') {
+      if (timer === null) {
+        message.channel.send("No active timer to stop.");
+      } else {
         clearTimeout(timer);
         timer = null;
+        message.channel.send("Timer stopped.")
         breakTime = 0;
+      }
     }
     // ask for time remaining on current timer. Returns time in minutes.
     if (message.content === '$time') {
@@ -106,10 +111,17 @@ client.on('message', message => {
             } else {
                 breakMsg = " left in study session."
             }
-            message.channel.send(minutes +  ":" + seconds + breakMsg);
+            var colon;
+            if (seconds >= 10) {
+              colon = ":";
+            } else {
+              colon = ":0"
+            }
+            message.channel.send(minutes +  colon + seconds + breakMsg);
         }
     }
 });
 
+keepAlive();
 // Log our bot in
 client.login(process.env.BOT_TOKEN);
